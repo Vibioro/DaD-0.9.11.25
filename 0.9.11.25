@@ -1,0 +1,141 @@
+from IPython.display import display, clear_output
+import time
+import random
+countMoney = 0
+TF = False
+ObjXY = {}
+countMove = 0
+exit = False
+
+#Настройки игры:
+sightPole = 5 #Ширина поля
+linePole = 5 #Длинна поля
+countMoneyPlay = 3 #Кол-во монет
+countPrept = 2 #Кол-во препятствий
+
+class Dungeon_and_Dragons:
+  def __init__(self, S, L):
+    self.S = S
+    self.L = L
+
+  def CreateCoordPlayer(self):
+    randomX = random.randint(0, self.L - 1)
+    randomY = random.randint(0, self.S - 1)
+    ObjXY["Player"] = [randomX, randomY]
+
+  def CreateCoordFinish(self):
+    ObjXY["Finish"] = ObjXY["Player"]
+    while ObjXY["Finish"] == ObjXY["Player"]:
+      randomX = random.randint(0, self.L - 1)
+      randomY = random.randint(0, self.S - 1)
+      ObjXY[f"Finish"] = [randomX, randomY]
+
+  def CreateCoordPrept(self, count):
+    for x in range(count):
+      ObjXY[f"Prept{x}"] = ObjXY["Player"]
+      brak = True
+      while brak == True:
+        brak = False
+        randomX = random.randint(0, self.L - 1)
+        randomY = random.randint(0, self.S - 1)
+        ObjXY[f"Prept{x}"] = [randomX, randomY]
+        for y in ObjXY:
+          if ObjXY.get(y) == ObjXY[f"Prept{x}"] and y != f"Prept{x}":
+            brak = True
+        if brak == False:
+          ObjXY[f"Prept{x}"] = [randomX, randomY]
+
+  def CreateCoordMoneys(self, count):
+    for x in range(count):
+      ObjXY[f"Money{x}"] = ObjXY[f"Player"]
+      brak = True
+      while brak == True:
+        brak = False
+        randomX = random.randint(0, self.L - 1)
+        randomY = random.randint(0, self.S - 1)
+        ObjXY[f"Money{x}"] = [randomX, randomY]
+        for y in ObjXY:
+          if ObjXY.get(y) == ObjXY[f"Money{x}"] and y != f"Money{x}":
+            brak = True
+        if brak == False:
+          ObjXY[f"Money{x}"] = [randomX, randomY]
+
+
+  def printLine(self, line, answer, CMP, CP, TF, countMoney):
+    for sight in range(self.S):
+      typeObj = None
+      for x in ObjXY:
+        #print(ObjXY.get(x), line, sight)
+        if ObjXY.get(x) == [line, sight]:
+          if typeObj != None and x[0] == "M":
+            countMoney += 1
+            del ObjXY[x]
+            break
+
+          if typeObj == None:
+            typeObj = x
+      if typeObj == None:
+        answer += "⬜ "
+      elif typeObj == "Player":
+        answer += "🙂 "
+      elif typeObj[0] == "F":
+        answer += "🏁 "
+      elif typeObj[0] == "M":
+        answer += "🟡 "
+      elif typeObj[0] == "P":
+        answer += "🟫 "
+    return answer, countMoney
+
+  def BackPlayer(PPX, PPY):
+    ObjXY[f"Player"] = [prPosPX, prPosPY]
+
+DaD = Dungeon_and_Dragons(sightPole, linePole)
+DaD.CreateCoordPlayer()
+DaD.CreateCoordFinish()
+DaD.CreateCoordMoneys(countMoneyPlay)
+DaD.CreateCoordPrept(countPrept)
+while True:
+  clear_output(wait=False)
+  time.sleep(0.1)
+  countMove += 1
+  #print(ObjXY)
+  for x in range(linePole):
+    answer = ""
+    answer, countMoney = DaD.printLine(x, answer, countMoneyPlay, countPrept, TF, countMoney)
+    print(answer)
+  print(f"Собрано {countMoney} монеток из {countMoneyPlay} ({countMoney/countMoneyPlay*100}%)")
+  movePlr = input("Мы должны начать движение! (W - Вверх, S - Вниз, A - Влево, D - Вправо): ")
+
+  prPosPX = ObjXY[f"Player"][0]
+  prPosPY = ObjXY[f"Player"][1]
+  if movePlr == "W" or movePlr == "w":
+    ObjXY[f"Player"][0] -= 1
+  elif movePlr == "S" or movePlr == "s":
+    ObjXY[f"Player"][0] += 1
+  elif movePlr == "A" or movePlr == "a":
+    ObjXY[f"Player"][1] -= 1
+  elif movePlr == "D" or movePlr == "d":
+    ObjXY[f"Player"][1] += 1
+  for x in ObjXY:
+      if ObjXY[f"Player"] == ObjXY.get(x):
+        if x == 'Finish':
+          if countMoney != countMoneyPlay:
+            Dungeon_and_Dragons.BackPlayer(prPosPX, prPosPY)
+          else:
+            exit = True
+            break
+        elif x[0] == "P" and x[1] == "r":
+          Dungeon_and_Dragons.BackPlayer(prPosPX, prPosPY)
+          break
+  if exit == True:
+    break #Победа
+
+randomEnd = random.randint(1, 100)
+if randomEnd <= 45:d
+  print(f"Ты выиграл, cделав {countMove} шагов!")
+elif randomEnd <= 78:
+  print(f"Поздравляю тебя с победой! Ты сделал {countMove} шагов")
+elif randomEnd <= 99:
+  print(f"Поздравляю от всего счастья тебя с победой!! Ты сумел пройти сложный путь и все же прошел игру за {countMove} шагов! Родина гордится тобой!")
+elif randomEnd <= 100:
+  print(f"#@%#%@#%%#%@%#%%@ {countMove} @#$@#$#@$#$@@")
